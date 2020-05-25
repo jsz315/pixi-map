@@ -4,11 +4,12 @@ import { MapView } from './map/MapView';
 import { Point } from './map/Point';
 import { ShortPath } from './map/ShortPath';
 import { MapData } from './map/MapData';
+import { GlobalData } from './GlobalData';
 
 export class MapTest extends BaseScene{
     
     // man:PIXI.Sprite;
-    url:string = 'man.jpg';
+    // url:string = 'man.jpg';
     box:PIXI.Container;
     dragging:boolean;
     startPot:any;
@@ -18,6 +19,7 @@ export class MapTest extends BaseScene{
     points:any[] = [];
     shortPath: ShortPath;
     mapView:MapView;
+    dragTarget:any;
 
     constructor(){
         super();
@@ -46,7 +48,9 @@ export class MapTest extends BaseScene{
     }
     
     async setup(){
-        await this.load(this.url);
+        await this.load(GlobalData.URL_WALL);
+        await this.load(GlobalData.URL_FOOD);
+        await this.load(GlobalData.URL_DOG);
 
         this.box = this.addBox();
         var rect = this.addRect();
@@ -103,13 +107,6 @@ export class MapTest extends BaseScene{
         txt.anchor.set(0, 1);
         return txt;
     }
-    
-    addMan():PIXI.Sprite{
-        var man = new PIXI.Sprite(this.loader.resources[this.url].texture);
-        man.interactive = true;
-        man.scale.set(0.4, 0.4);
-        return man;
-    }
 
     addBox():PIXI.Container{
         var box = new PIXI.Container();
@@ -126,11 +123,15 @@ export class MapTest extends BaseScene{
         return graphics;
     }
 
-    getDistance(a:any, b:any){
+    getDistance(p1:any, p2:any){
+        var a = p1.getLocalPosition(this.mapView);
+        var b = p2.getLocalPosition(this.mapView);
         return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
 
-    getCenter(a:any, b:any){
+    getCenter(p1:any, p2:any){
+        var a = p1.getLocalPosition(this.mapView);
+        var b = p2.getLocalPosition(this.mapView);
         return {
             x: (a.x + b.x) / 2,
             y: (a.y + b.y) / 2
@@ -138,22 +139,32 @@ export class MapTest extends BaseScene{
     }
 
     onDragStart(e:any){
-        console.log(e);
-        var local = e.data.getLocalPosition(this.box);
+        console.log(e, 'click');
+        // var local = e.data.getLocalPosition(this.mapView);
         this.dragging = true;
-        this.startPot = local;
+        
 
-        this.points.push({
-            data: e.data.getLocalPosition(this.mapView),
-            global: e.data.global,
-            id: e.data.identifier
-        });
+        // this.points.push({
+        //     data: e.data.getLocalPosition(this.mapView),
+        //     global: e.data.global,
+        //     id: e.data.identifier
+        // });
+
+        this.points.push(e.data);
 
         if(this.points.length == 2){
-            this.center = this.getCenter(this.points[0].data, this.points[1].data);
+            this.center = this.getCenter(this.points[0], this.points[1]);
         }
         else{
             this.mapView.click(e.data.getLocalPosition(this.mapView));
+            this.dragTarget = this.mapView.getClick() || this.mapView;
+            if(this.dragTarget == this.mapView){
+                this.startPot = e.data.getLocalPosition(this.container);
+            }
+            else{
+                this.startPot = e.data.getLocalPosition(this.mapView);
+            }
+            console.log(this.dragTarget, 'dragTarget', this.startPot);
         }
 
         // this.txt.text = "手指数：" + ps.length + ", identifier" + e.data.identifier;
@@ -163,7 +174,7 @@ export class MapTest extends BaseScene{
         if(!this.dragging) return;
         // var ps = e.data.originalEvent.changedTouches;
         if(this.points.length == 2){
-            var size = this.getDistance(this.points[0].global, this.points[1].global);
+            var size = this.getDistance(this.points[0], this.points[1]);
             if(this.distance){
                 var width = this.mapView.width;
                 var height = this.mapView.height;
@@ -193,20 +204,34 @@ export class MapTest extends BaseScene{
             }
         }
         else{
-            var local = e.data.getLocalPosition(this.box);
-            this.mapView.x += local.x - this.startPot.x;
-            this.mapView.y += local.y - this.startPot.y;
-            this.startPot = local;
+            var local, np;
+            if(this.dragTarget == this.mapView){
+                local = e.data.getLocalPosition(this.container);
+                // np = this.startPot.getLocalPosition(this.container);
+                this.dragTarget.x += local.x - this.startPot.x;
+                this.dragTarget.y += local.y - this.startPot.y;
+                this.startPot = e.data.getLocalPosition(this.container);
+            }
+            else{
+                local = e.data.getLocalPosition(this.mapView);
+                // np = this.startPot.getLocalPosition(this.mapView);
+                this.dragTarget.x += local.x - this.startPot.x;
+                this.dragTarget.y += local.y - this.startPot.y;
+                this.startPot = e.data.getLocalPosition(this.mapView);
+            }
+            console.log("move", this.startPot == e.data);
+            this.startPot = e.data;
         }
     }
 
     onDragEnd(e:any){
-        this.points = this.points.filter(item => item.id != e.data.identifier);
+        this.points = this.points.filter(item => item.identifier != e.data.identifier);
         if(this.points.length != 2){
             this.distance = 0;
             this.dragging = false;
             this.center = null;
             this.txt.text = "清除距离";
+            this.mapView.updateDragPosition();
         }
         // this.txt.text = "手指数：" + this.points.length + ", identifier" + e.data.identifier;
     }
