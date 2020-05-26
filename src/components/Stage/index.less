@@ -9,6 +9,24 @@
     .canvas{
         width: 100%;
     }
+    .tip{
+        opacity: 0;
+        animation: fade 3s;
+        animation-fill-mode: forwards;
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        z-index: 1;
+        padding: 2vw 4vw;
+        border-radius: 4px;
+        width: fit-content;
+        height: fit-content;
+        background: rgba(0, 0, 0, 0.8);
+        color: #ffffff;
+    }
     .btns{
         padding: 10px;
         .btn{
@@ -33,4 +51,11 @@
             padding: 10px;
         }
     }
+}
+
+@keyframes fade{
+    0%{opacity: 0;transform: translateY(20px);}
+    20%{opacity: 1;transform: translateY(0px);}
+    80%{opacity: 1;transform: translateY(0px);}
+    100%{opacity: 0;transform: translateY(-20px);}
 }

@@ -18,11 +18,16 @@ export class PathView extends PIXI.Container {
         this.view.clear();
 
         this.view.lineStyle(weight, 0x999999, 0.4);
-        for(var i = 0; i < points.length - 1; i++){
+        for(var i = 0; i < points.length; i++){
             var sp = points[i];
-            var ep = points[i + 1];
-            this.view.moveTo((sp.col + 0.5) * size, (sp.row + 0.5) * size);
-            this.view.lineTo((ep.col + 0.5) * size, (ep.row + 0.5) * size);
+            // var ep = points[i + 1];
+            if(i == 0){
+                this.view.moveTo((sp.col + 0.5) * size, (sp.row + 0.5) * size);
+            }
+            else{
+                this.view.lineTo((sp.col + 0.5) * size, (sp.row + 0.5) * size);
+            }
+            
         }
     }
 

@@ -23,12 +23,10 @@ export class ShortPath {
         while (running) {
             var curPoint: Point = this.popMinCostPoint();
             if (curPoint == null) {
-                console.log("查找完毕");
                 running = false;
             }
             else {
                 if (ShortPath.checkSame(curPoint, end)) {
-                    console.log("查找成功");
                     running = false;
                 }
                 if (!ShortPath.checkContain(this.closeList, curPoint)) {
@@ -37,7 +35,6 @@ export class ShortPath {
             }
             if (running) {
                 var aroundList = this.getAroundPoint(curPoint);
-                // console.log(aroundList.length, "total");
                 aroundList.forEach((point: Point) => {
                     if (!ShortPath.checkContain(this.closeList, point)) {
                         if (ShortPath.checkContain(this.openList, point)) {
@@ -70,6 +67,7 @@ export class ShortPath {
         }
         else {
             console.log("查找失败, 耗时：", Date.now() - timer);
+            aim = [];
         }
         return aim;
     }

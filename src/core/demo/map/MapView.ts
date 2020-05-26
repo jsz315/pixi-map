@@ -32,9 +32,10 @@ export class MapView extends PIXI.Container {
         this.width = width;
         this.height = height;
         this.createViews();
+        
+        this.addPathView();
         this.addDog();
         this.addFood();
-        this.addPathView();
     }
 
     showPath(points:Array<Point>){
@@ -61,7 +62,7 @@ export class MapView extends PIXI.Container {
         this.dog.anchor.set(0.5, 0.5);
         var scale = this.size / this.dog.width;
         this.dog.scale.set(scale, scale);
-        this.dog.position.set(this.size / 2, this.size / 2);
+        this.dog.position.set(this.size * (0.5 + 3), this.size * (0.5 + 3));
         this.addChild(this.dog);
     }
 
@@ -70,7 +71,7 @@ export class MapView extends PIXI.Container {
         this.food.anchor.set(0.5, 0.5);
         var scale = this.size / this.food.width;
         this.food.scale.set(scale, scale);
-        this.food.position.set(this.size / 2, this.size / 2);
+        this.food.position.set(this.size * (0.5 + 6), this.size * (0.5 + 6));
         this.addChild(this.food);
     }
 
@@ -83,20 +84,22 @@ export class MapView extends PIXI.Container {
       }
     }
 
-    click(point:any){
-        var col = Math.floor(point.x / this.size);
-        var row = Math.floor(point.y / this.size);
-        var data = this.mapData.points;
-        console.log(point);
-        if(data[row] && data[row][col]){
-            if(data[row][col].type == MapData.TYPE_FREE){
-                data[row][col].type = MapData.TYPE_BLOCK;
+    click(point:any, edit:boolean){
+        if(edit){
+            var col = Math.floor(point.x / this.size);
+            var row = Math.floor(point.y / this.size);
+            var data = this.mapData.points;
+            if(data[row] && data[row][col]){
+                if(data[row][col].type == MapData.TYPE_FREE){
+                    data[row][col].type = MapData.TYPE_BLOCK;
+                }
+                else{
+                    data[row][col].type = MapData.TYPE_FREE;
+                }
+                this.update();
             }
-            else{
-                data[row][col].type = MapData.TYPE_FREE;
-            }
-            this.update();
         }
+
         if(this.getDistance(point, this.food) < this.size / 2){
             this.target = this.food;
         }

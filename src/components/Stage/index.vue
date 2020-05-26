@@ -8,7 +8,11 @@
 
         <div class="control">
             <div class="btn" @click="findPath">开始寻路</div>
+            <div class="btn" @click="editMap">{{edit ? '点击停止编辑地图' : '点击开始编辑地图'}}</div>
+            <div class="btn" @click="fitCenter">居中显示</div>
         </div>
+
+        <div class="tip" v-if="tip">{{tip}}</div>
     </div>
 
 </template>
@@ -21,10 +25,13 @@ import {TextTest} from '../../core/demo/TextTest'
 import listener from '../../core/listener'
 
 let game;
+let timer;
 export default {
     data(){
         return {
             name: '',
+            edit: false,
+            tip: '',
             list: [
                 {
                     name: '地图',
@@ -40,6 +47,18 @@ export default {
     mounted(){
         game = new Game(this.$refs.canvas);
         this.show(this.list[0]);
+
+        listener.on("noWay", ()=>{
+            clearTimeout(timer);
+            this.tip = "";
+            this.$nextTick(() => {
+                this.tip = "寻路失败";
+            })
+            timer = setTimeout(()=>{
+                this.tip = "";
+            }, 3000)
+            
+        })
     },
     methods: {
         show(item, e) {
@@ -49,6 +68,13 @@ export default {
         },
         findPath(){
             listener.emit("findPath");
+        },
+        editMap(){
+            this.edit = !this.edit;
+            listener.emit("editMap", this.edit);
+        },
+        fitCenter(){
+            listener.emit("fitCenter");
         }
     },
 }
