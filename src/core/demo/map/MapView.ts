@@ -3,6 +3,8 @@ import {MapData} from './MapData'
 import {ViewFactory} from './ViewFactory'
 import { RectView } from './RectView';
 import { GlobalData } from '../GlobalData';
+import { PathView } from './PathView';
+import { Point } from './Point';
 
 export class MapView extends PIXI.Container {
 
@@ -13,6 +15,8 @@ export class MapView extends PIXI.Container {
     dog:PIXI.Sprite;
     food:PIXI.Sprite;
     target:any;
+
+    pathView:PathView;
 
     static COLOR_BLOCK:number = 0x000000;
     static COLOR_FREE:number = 0xffffff;
@@ -30,6 +34,26 @@ export class MapView extends PIXI.Container {
         this.createViews();
         this.addDog();
         this.addFood();
+        this.addPathView();
+    }
+
+    showPath(points:Array<Point>){
+        this.pathView.show(points);
+    }
+
+    hidePath(){
+        this.pathView.hide();
+    }
+
+    addPathView(){
+        this.pathView = new PathView(this.size);
+        this.addChild(this.pathView);
+    }
+
+    findViewPoint(view:PIXI.Sprite):Point{
+        var col = Math.floor(view.x / this.size);
+        var row = Math.floor(view.y / this.size);
+        return this.mapData.points[row][col];
     }
 
     addDog(){

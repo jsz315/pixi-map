@@ -12,6 +12,7 @@ export class ShortPath {
     }
 
     find(start: Point, end: Point): Array<Point> {
+        this.mapData.clearParent();
         console.log("start");
         this.openList = [];
         this.closeList = [];
@@ -36,7 +37,7 @@ export class ShortPath {
             }
             if (running) {
                 var aroundList = this.getAroundPoint(curPoint);
-                console.log(aroundList.length, "total");
+                // console.log(aroundList.length, "total");
                 aroundList.forEach((point: Point) => {
                     if (!ShortPath.checkContain(this.closeList, point)) {
                         if (ShortPath.checkContain(this.openList, point)) {

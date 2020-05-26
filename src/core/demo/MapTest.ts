@@ -5,6 +5,7 @@ import { Point } from './map/Point';
 import { ShortPath } from './map/ShortPath';
 import { MapData } from './map/MapData';
 import { GlobalData } from './GlobalData';
+import listener from '../listener'
 
 export class MapTest extends BaseScene{
     
@@ -20,6 +21,7 @@ export class MapTest extends BaseScene{
     shortPath: ShortPath;
     mapView:MapView;
     dragTarget:any;
+    findPathEvent:any;
 
     constructor(){
         super();
@@ -29,22 +31,24 @@ export class MapTest extends BaseScene{
         super.init(width, height, app);
         this.setup();
 
-        setTimeout(() => {
+        this.findPathEvent = listener.on("findPath", () => {
+            console.log("findPath");
             this.test();
-        }, 4000);
+        })
     }
 
     test(){
-        this.mapView.changeType(2, 3, MapData.TYPE_PLAYER);
-        this.mapView.changeType(8, 9, MapData.TYPE_AIM);
+        // this.mapView.changeType(2, 3, MapData.TYPE_PLAYER);
+        // this.mapView.changeType(8, 9, MapData.TYPE_AIM);
 
-        var start: Point = this.mapView.mapData.find(MapData.TYPE_PLAYER);
-        var end: Point = this.mapView.mapData.find(MapData.TYPE_AIM);
+        var start: Point = this.mapView.findViewPoint(this.mapView.dog);
+        var end: Point = this.mapView.findViewPoint(this.mapView.food);
         var list = this.shortPath.find(start, end);
-        list.forEach(item => {
-            item.type = MapData.TYPE_PLAYER;
-        })
+        // list.forEach(item => {
+        //     item.type = MapData.TYPE_PLAYER;
+        // })
         this.mapView.update();
+        this.mapView.showPath(list);
     }
     
     async setup(){
@@ -124,8 +128,8 @@ export class MapTest extends BaseScene{
     }
 
     getDistance(p1:any, p2:any){
-        var a = p1.getLocalPosition(this.mapView);
-        var b = p2.getLocalPosition(this.mapView);
+        var a = p1.global;
+        var b = p2.global;
         return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
 
@@ -149,6 +153,8 @@ export class MapTest extends BaseScene{
         //     global: e.data.global,
         //     id: e.data.identifier
         // });
+
+        // var ed = new PIXI.interaction.InteractionData();
 
         this.points.push(e.data);
 
@@ -174,6 +180,9 @@ export class MapTest extends BaseScene{
         if(!this.dragging) return;
         // var ps = e.data.originalEvent.changedTouches;
         if(this.points.length == 2){
+
+            this.center = this.getCenter(this.points[0], this.points[1]);
+
             var size = this.getDistance(this.points[0], this.points[1]);
             if(this.distance){
                 var width = this.mapView.width;
@@ -189,14 +198,14 @@ export class MapTest extends BaseScene{
                 if(scale < 0.1){
                     scale = 0.1;
                 }
-                else if(scale > 2){
-                    scale = 2;
+                else if(scale > 8){
+                    scale = 8;
                 }
                 this.mapView.scale.set(scale, scale);
                 var ox = this.mapView.width - width;
                 var oy = this.mapView.height - height;
-                this.mapView.x -= ox * this.center.x / this.mapView.width;
-                this.mapView.y -= oy * this.center.y / this.mapView.height;
+                this.mapView.x -= ox * (this.center.x - this.mapView.x) / this.mapView.width;
+                this.mapView.y -= oy * (this.center.y - this.mapView.y) / this.mapView.height;
             }
             else{
                 this.distance = size;
@@ -204,23 +213,24 @@ export class MapTest extends BaseScene{
             }
         }
         else{
-            var local, np;
+            var local;
+            var offsetX:number, offsetY:number;
             if(this.dragTarget == this.mapView){
                 local = e.data.getLocalPosition(this.container);
-                // np = this.startPot.getLocalPosition(this.container);
-                this.dragTarget.x += local.x - this.startPot.x;
-                this.dragTarget.y += local.y - this.startPot.y;
+                offsetX = local.x - this.startPot.x;
+                offsetY = local.y - this.startPot.y;
                 this.startPot = e.data.getLocalPosition(this.container);
             }
             else{
                 local = e.data.getLocalPosition(this.mapView);
-                // np = this.startPot.getLocalPosition(this.mapView);
-                this.dragTarget.x += local.x - this.startPot.x;
-                this.dragTarget.y += local.y - this.startPot.y;
+                offsetX = local.x - this.startPot.x;
+                offsetY = local.y - this.startPot.y;
                 this.startPot = e.data.getLocalPosition(this.mapView);
             }
-            console.log("move", this.startPot == e.data);
-            this.startPot = e.data;
+            this.dragTarget.x += offsetX;
+            this.dragTarget.y += offsetY;
+            console.log("move", offsetX.toFixed(0), offsetY.toFixed(0));
+            // this.startPot = e.data;
         }
     }
 
@@ -241,6 +251,7 @@ export class MapTest extends BaseScene{
     }
 
     destory(): void {
+        this.findPathEvent.destory();
         super.destory();
         this.container.interactive = false;
         this.container.off('pointerdown', this.onDragStart.bind(this));

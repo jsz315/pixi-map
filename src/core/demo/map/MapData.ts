@@ -22,6 +22,14 @@ export class MapData{
         console.log("MapData init");
     }
 
+    clearParent(){
+        for(var i = 0; i < this.row; i++){
+            for(var j = 0; j < this.col; j++){
+                this.points[i][j].parent = null;
+            }
+        }
+    }
+
     reset(){
         // this.data = [];
         this.points = [];

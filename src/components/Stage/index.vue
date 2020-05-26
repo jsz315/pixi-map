@@ -3,21 +3,22 @@
         <div class="title">{{name}}</div>
         <canvas class="canvas" ref="canvas"></canvas>
         <div class="btns">
-            <div class="btn" @click="show(item)" v-for="(item, index) in list" v-bind:key="index">{{item.name}}</div>
+            <div class="btn" @click="show(item, $event)" v-for="(item, index) in list" v-bind:key="index">{{item.name}}</div>
+        </div>
+
+        <div class="control">
+            <div class="btn" @click="findPath">开始寻路</div>
         </div>
     </div>
 
 </template>
 
 <script>
+
 import {Game} from '../../core/Game'
-import {SpriteTest} from '../../core/demo/SpriteTest'
-import {PositionTest} from '../../core/demo/PositionTest'
-import {ShapeTest} from '../../core/demo/ShapeTest'
-import {TextTest} from '../../core/demo/TextTest'
-import {DragTest} from '../../core/demo/DragTest'
-import {ScaleTest} from '../../core/demo/ScaleTest'
 import {MapTest} from '../../core/demo/MapTest'
+import {TextTest} from '../../core/demo/TextTest'
+import listener from '../../core/listener'
 
 let game;
 export default {
@@ -30,29 +31,9 @@ export default {
                     component: MapTest
                 },
                 {
-                    name: 'Sprite中心点',
-                    component: SpriteTest
-                },
-                {
-                    name: 'Position坐标转换',
-                    component: PositionTest
-                },
-                {
-                    name: 'Shape画图',
-                    component: ShapeTest
-                },
-                {
-                    name: 'Text文字',
+                    name: '文字',
                     component: TextTest
-                },
-                {
-                    name: '拖动物体',
-                    component: DragTest
-                },
-                {
-                    name: '缩放物体',
-                    component: ScaleTest
-                },
+                }
             ]
         }
     },
@@ -61,10 +42,14 @@ export default {
         this.show(this.list[0]);
     },
     methods: {
-        show(item) {
+        show(item, e) {
+            console.log(e);
             this.name = item.name;
             game.reset(new item.component);
         },
+        findPath(){
+            listener.emit("findPath");
+        }
     },
 }
 </script>

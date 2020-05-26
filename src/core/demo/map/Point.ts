@@ -3,7 +3,7 @@ export class Point{
   col:number;//第几列
   row:number;//第几行
   
-  parent:Point;
+  parent:Point|null;
 
   toStart:number = 0;//到起点的代价
   toEnd:number = 0;//到终点的代价
