@@ -5,8 +5,10 @@ import { Point } from './map/Point';
 import { ShortPath } from './map/ShortPath';
 import { GlobalData } from './GlobalData';
 import listener from '../listener'
+import { ViewFactory } from './map/ViewFactory';
 
 export class MapTest extends BaseScene{
+
     box:PIXI.Container;
     dragging:boolean;
     startPot:any;
@@ -19,6 +21,7 @@ export class MapTest extends BaseScene{
     dragTarget:any;
     findPathEvents:any;
     edit:boolean;
+    drag:boolean;
 
     constructor(){
         super();
@@ -32,17 +35,24 @@ export class MapTest extends BaseScene{
             this.findPath();
         })
 
-        var e2 = listener.on("editMap", (edit:boolean) => {
-            this.edit = edit;
-        })
-
-        var e3 = listener.on("fitCenter", () => {
+        var e2 = listener.on("fitCenter", () => {
             this.mapView.scale.set(0.9, 0.9);
             this.mapView.x = (this.width - this.mapView.width) / 2;
             this.mapView.y = (this.height - this.mapView.height) / 2;
         })
 
-        this.findPathEvents = [e1, e2, e3];
+        var e3 = listener.on("onDraw", (edit:boolean) => {
+            this.edit = edit;
+        })
+
+        var e4 = listener.on("onDrag", (drag:boolean) => {
+            this.drag = drag;
+            this.mapView.scale.set(0.9, 0.9);
+            this.mapView.x = (this.width - this.mapView.width) / 2;
+            this.mapView.y = (this.height - this.mapView.height) / 2;
+        })
+
+        this.findPathEvents = [e1, e2, e3, e4];
     }
 
     findPath(){
@@ -66,6 +76,8 @@ export class MapTest extends BaseScene{
         
         this.container.interactive = true;
         this.mapView = new MapView(this.width, this.height, 80);
+        var background = ViewFactory.makeRect(0xaeaeae, this.width, this.height);
+        this.container.addChild(background);
         this.container.addChild(this.mapView);
         this.shortPath = new ShortPath(this.mapView.mapData);
 
@@ -133,7 +145,7 @@ export class MapTest extends BaseScene{
 
     onDragMove(e:any){
         if(!this.dragging) return;
-        if(this.points.length == 2){
+        if(this.points.length == 2 && this.drag){
 
             this.center = this.getCenter(this.points[0], this.points[1]);
 
@@ -169,11 +181,16 @@ export class MapTest extends BaseScene{
         else{
             var local;
             var offsetX:number, offsetY:number;
+            var canMove = true;
             if(this.dragTarget == this.mapView){
                 local = e.data.getLocalPosition(this.container);
                 offsetX = local.x - this.startPot.x;
                 offsetY = local.y - this.startPot.y;
                 this.startPot = e.data.getLocalPosition(this.container);
+                if(!this.drag){
+                    canMove = false;
+                    this.mapView.click(e.data.getLocalPosition(this.mapView), this.edit, true);
+                }
             }
             else{
                 local = e.data.getLocalPosition(this.mapView);
@@ -182,8 +199,11 @@ export class MapTest extends BaseScene{
                 this.startPot = e.data.getLocalPosition(this.mapView);
                 this.mapView.hidePath();
             }
-            this.dragTarget.x += offsetX;
-            this.dragTarget.y += offsetY;
+            if(canMove){
+                this.dragTarget.x += offsetX;
+                this.dragTarget.y += offsetY;
+            }
+            
         }
     }
 

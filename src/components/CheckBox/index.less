@@ -1,0 +1,27 @@
+.check-box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .cir{
+        width: 3.8vw;
+        height: 3.8vw;
+        border-radius: 50%;
+        border: solid 1px #aeaeae;
+        margin-right: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        &.selected::after{
+            content: "";
+            display: block;
+            width: 2vw;
+            height: 2vw;
+            border-radius: 50%;
+            background: #0b76f1;
+        }
+    }
+    .tip{
+        flex: 1;
+    }
+    
+}

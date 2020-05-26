@@ -84,7 +84,7 @@ export class MapView extends PIXI.Container {
       }
     }
 
-    click(point:any, edit:boolean){
+    click(point:any, edit:boolean, isOver:boolean = false){
         if(edit){
             var col = Math.floor(point.x / this.size);
             var row = Math.floor(point.y / this.size);
@@ -94,11 +94,19 @@ export class MapView extends PIXI.Container {
                     data[row][col].type = MapData.TYPE_BLOCK;
                 }
                 else{
-                    data[row][col].type = MapData.TYPE_FREE;
+                    if(!isOver){
+                        data[row][col].type = MapData.TYPE_FREE;
+                    }
+                    
                 }
                 this.update();
             }
+            else{
+                console.log(point, '超出地图')
+            }
         }
+
+        console.log(point)
 
         if(this.getDistance(point, this.food) < this.size / 2){
             this.target = this.food;

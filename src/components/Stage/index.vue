@@ -2,17 +2,16 @@
     <div class="stage">
         <div class="title">{{name}}</div>
         <canvas class="canvas" ref="canvas"></canvas>
-        <div class="btns">
-            <div class="btn" @click="show(item, $event)" v-for="(item, index) in list" v-bind:key="index">{{item.name}}</div>
-        </div>
-
         <div class="control">
             <div class="btn" @click="findPath">开始寻路</div>
-            <div class="btn" @click="editMap">{{edit ? '点击停止编辑地图' : '点击开始编辑地图'}}</div>
             <div class="btn" @click="fitCenter">居中显示</div>
         </div>
 
         <div class="tip" v-if="tip">{{tip}}</div>
+        <div class="checks">
+            <CheckBox tip="绘制地图" @select="onDraw"/>
+            <CheckBox tip="拖动地图" @select="onDrag"/>
+        </div>
     </div>
 
 </template>
@@ -21,8 +20,8 @@
 
 import {Game} from '../../core/Game'
 import {MapTest} from '../../core/demo/MapTest'
-import {TextTest} from '../../core/demo/TextTest'
 import listener from '../../core/listener'
+import CheckBox from '../CheckBox'
 
 let game;
 let timer;
@@ -36,14 +35,11 @@ export default {
                 {
                     name: '地图',
                     component: MapTest
-                },
-                {
-                    name: '文字',
-                    component: TextTest
                 }
             ]
         }
     },
+    components: {CheckBox},
     mounted(){
         game = new Game(this.$refs.canvas);
         this.show(this.list[0]);
@@ -61,20 +57,21 @@ export default {
         })
     },
     methods: {
-        show(item, e) {
-            console.log(e);
+        show(item) {
             this.name = item.name;
             game.reset(new item.component);
         },
         findPath(){
             listener.emit("findPath");
         },
-        editMap(){
-            this.edit = !this.edit;
-            listener.emit("editMap", this.edit);
-        },
         fitCenter(){
             listener.emit("fitCenter");
+        },
+        onDraw(data){
+            listener.emit("onDraw", data);
+        },
+        onDrag(data){
+            listener.emit("onDrag", data);
         }
     },
 }
