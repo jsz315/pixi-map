@@ -4,7 +4,6 @@
         <canvas class="canvas" ref="canvas"></canvas>
         <div class="control">
             <div class="btn" @click="findPath">开始寻路</div>
-            <div class="btn" @click="fitCenter">居中显示</div>
         </div>
 
         <div class="tip" v-if="tip">{{tip}}</div>
@@ -63,9 +62,6 @@ export default {
         },
         findPath(){
             listener.emit("findPath");
-        },
-        fitCenter(){
-            listener.emit("fitCenter");
         },
         onDraw(data){
             listener.emit("onDraw", data);

@@ -1,16 +1,14 @@
 import { Point } from "./Point";
+import { NumberTooler } from "./NumberTooler";
 
 export class MapData{
     
     static TYPE_FREE:number = 0;
     static TYPE_BLOCK:number = 1;
-    static TYPE_AIM:number = 2;
-    static TYPE_PLAYER:number = 3;
 
     row:number;
     col:number;
     size:number;
-    // data:any;
 
     points:Array<Array<Point>> = [];
 
@@ -31,13 +29,10 @@ export class MapData{
     }
 
     reset(){
-        // this.data = [];
         this.points = [];
         for(var i = 0; i < this.row; i++){
-            // this.data[i] = [];
             this.points[i] = [];
             for(var j = 0; j < this.col; j++){
-                // this.data[i][j] = MapData.TYPE_BLOCK;
                 this.points[i][j] = new Point(i, j);
                 this.points[i][j].type = MapData.TYPE_FREE;
             }
@@ -53,6 +48,21 @@ export class MapData{
             }
         }
         return null;
+    }
+
+    getMapMinString():string{
+        var list:Array<any> = [];
+        for(var i = 0; i < this.row; i++){
+            var temp:Array<any> = [];
+            for(var j = 0; j < this.col; j++){
+                temp.push(this.points[i][j].type);
+            }
+            var str2:string = temp.join("");
+            var str16:string = NumberTooler.string2T16(str2);
+            list.push(str16);
+        }
+        var map = list.join(".");
+        return map;
     }
 
 }

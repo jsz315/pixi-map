@@ -35,24 +35,26 @@ export class MapTest extends BaseScene{
             this.findPath();
         })
 
-        var e2 = listener.on("fitCenter", () => {
-            this.mapView.scale.set(0.9, 0.9);
-            this.mapView.x = (this.width - this.mapView.width) / 2;
-            this.mapView.y = (this.height - this.mapView.height) / 2;
-        })
-
-        var e3 = listener.on("onDraw", (edit:boolean) => {
+        var e2 = listener.on("onDraw", (edit:boolean) => {
             this.edit = edit;
         })
 
-        var e4 = listener.on("onDrag", (drag:boolean) => {
+        var e3 = listener.on("onDrag", (drag:boolean) => {
             this.drag = drag;
             this.mapView.scale.set(0.9, 0.9);
             this.mapView.x = (this.width - this.mapView.width) / 2;
             this.mapView.y = (this.height - this.mapView.height) / 2;
+
+            var mapStr = this.mapView.mapData.getMapMinString();
+            var start: Point = this.mapView.findViewPoint(this.mapView.dog);
+            var end: Point = this.mapView.findViewPoint(this.mapView.food);
+            var minStr = [mapStr, this.mapView.mapData.row, this.mapView.mapData.col, start.row, start.col, end.row, end.col].join(",");
+            console.log("minStr");
+            console.log(minStr);
+
         })
 
-        this.findPathEvents = [e1, e2, e3, e4];
+        this.findPathEvents = [e1, e2, e3];
     }
 
     findPath(){

@@ -175,12 +175,6 @@ export class MapView extends PIXI.Container {
         case MapData.TYPE_BLOCK:
           color = MapView.COLOR_BLOCK;
           break
-        case MapData.TYPE_AIM:
-          color = MapView.COLOR_AIM;
-          break
-        case MapData.TYPE_PLAYER:
-          color = MapView.COLOR_PLAYER;
-          break
       }
       return color;
     }
