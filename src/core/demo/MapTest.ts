@@ -51,7 +51,6 @@ export class MapTest extends BaseScene{
             var minStr = [mapStr, this.mapView.mapData.row, this.mapView.mapData.col, start.row, start.col, end.row, end.col].join(",");
             console.log("minStr");
             console.log(minStr);
-
         })
 
         this.findPathEvents = [e1, e2, e3];
