@@ -18,19 +18,28 @@ export class Game{
     }
 
     init(){
-        this.width = 750 || window.innerWidth * window.devicePixelRatio;
-        this.height = 750 || window.innerWidth * window.devicePixelRatio;
+        var size = window.innerWidth * window.devicePixelRatio;
+        size = size > 1280 ? 1280 : size;
+        this.width = size;
+        this.height = size;
         this.app = new PIXI.Application({
             autoStart: true,
             width: this.width,
             height: this.height,
             view: this.canvas,
-            antialias: true
+            antialias: false
         })
 
         this.app.renderer.backgroundColor = 0xf0f0f0;
         console.log(this.app, "app");
         this.app.ticker.add(this.loop.bind(this));
+
+        window.onresize = () => {
+            this.app.renderer.view.style.width = window.innerWidth + "px";
+            this.app.renderer.view.style.height = window.innerWidth + "px";
+            this.app.resize();
+            this.app.renderer.resize(window.innerWidth, window.innerWidth);
+        }
     }
 
     reset(scene:IScene){

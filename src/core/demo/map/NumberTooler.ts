@@ -1,3 +1,6 @@
+import { Point } from "./Point";
+import { groupD8 } from "pixi.js";
+
 export class NumberTooler{
 
     /**
@@ -32,5 +35,33 @@ export class NumberTooler{
             list.push(0);
         }
         return (list.join("") + str).substr(-total);
+    }
+
+    /**
+     * 编码起始点位置
+     * @param start 起点
+     * @param end 终点
+     */
+    static encodeMap(start:Point, end:Point):number{
+        var list = [];
+        list.push(NumberTooler.addZero(start.row + "", 2));
+        list.push(NumberTooler.addZero(start.col + "", 2));
+        list.push(NumberTooler.addZero(end.row + "", 2));
+        list.push(NumberTooler.addZero(end.col + "", 2));
+        var num = Number('0x' + list.join(""));
+        return num;
+    }
+
+    /**
+     * 解码起始点位置
+     * @param num 10进制数字
+     */
+    static decodeMap(num:number):Array<number>{
+        var str = NumberTooler.addZero(num.toString(16), 8);
+        var list = [];
+        for(var i = 0; i < 4; i++){
+            list.push(Number(str.substr(i * 2, 2)));
+        }
+        return list;
     }
 }

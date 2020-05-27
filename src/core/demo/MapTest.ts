@@ -6,6 +6,7 @@ import { ShortPath } from './map/ShortPath';
 import { GlobalData } from './GlobalData';
 import listener from '../listener'
 import { ViewFactory } from './map/ViewFactory';
+import { NumberTooler } from './map/NumberTooler';
 
 export class MapTest extends BaseScene{
 
@@ -48,9 +49,13 @@ export class MapTest extends BaseScene{
             var mapStr = this.mapView.mapData.getMapMinString();
             var start: Point = this.mapView.findViewPoint(this.mapView.dog);
             var end: Point = this.mapView.findViewPoint(this.mapView.food);
-            var minStr = [mapStr, this.mapView.mapData.row, this.mapView.mapData.col, start.row, start.col, end.row, end.col].join(",");
+            var minStr = [mapStr, this.mapView.mapData.row, this.mapView.mapData.col, NumberTooler.encodeMap(start, end)].join(",");
+
             console.log("minStr");
             console.log(minStr);
+
+            var aim = NumberTooler.decodeMap(Number(minStr.split(",").pop()));
+            console.log(aim);
         })
 
         this.findPathEvents = [e1, e2, e3];
